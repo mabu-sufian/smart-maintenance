@@ -1,11 +1,19 @@
 package com.example.maintenance.model;
 
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name="Issue")
 public class Issue {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String description;
     private String location;
+    private String priority;
 
 
     public Long getId()
@@ -37,7 +45,11 @@ public class Issue {
         this.description = description;
     }
 
+
+
     public void setLocation(String location) {
         this.location = location;
+    }
+    public Issue() {
     }
 }

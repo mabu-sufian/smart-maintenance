@@ -25,17 +25,23 @@ public class IssueService {
 
     public Issue getIssueById(Long id)
     {
-        return issueRepository.findById(id);
+        return issueRepository.findById(id).orElseThrow(()-> new RuntimeException("Issue not found"+ id));
     }
 
-    public Issue updateIssue(Long id, Issue issue)
-    {
-        return issueRepository.update(id,issue);
+    public Issue updateIssue(Long id, Issue issue) {
+        Issue exisitngIssue = issueRepository.findById(id).orElseThrow(()-> new RuntimeException("Issue not found"+ id));
+
+
+        exisitngIssue.setTitle(issue.getTitle());
+        exisitngIssue.setDescription(issue.getDescription());
+        exisitngIssue.setLocation(issue.getLocation());
+
+        return issueRepository.save(exisitngIssue);
     }
 
     public void deleteIssue(Long id)
     {
-        issueRepository.delete(id);
+        issueRepository.deleteById(id);
     }
 
 
