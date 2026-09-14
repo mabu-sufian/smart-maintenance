@@ -1,34 +1,23 @@
-package com.example.maintenance.model;
+package com.example.maintenance.dto;
 
+import com.example.maintenance.model.IssueCategory;
+import com.example.maintenance.model.IssuePriority;
+import com.example.maintenance.model.IssueStatus;
 
-import jakarta.persistence.*;
+public class IssueResponseDTO {
 
-@Entity
-@Table(name="Issue")
-public class Issue {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String description;
     private String location;
-    private String createdAT;
-
-    @Enumerated(EnumType.STRING)
     private IssueCategory issueCategory;
-
-    @Enumerated(EnumType.STRING)
     private IssuePriority issuePriority;
+    private IssueStatus issueStatus;
 
-    @Enumerated(EnumType.STRING)
-    private  IssueStatus issueStatus;
-
-
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
+
 
     public String getTitle() {
         return title;
@@ -54,24 +43,8 @@ public class Issue {
         this.description = description;
     }
 
-//    public void setCreatedAT(String createdAT) {
-//        this.createdAT = createdAT;
-//    }
-
-//    public String getCreatedAT() {
-//        return createdAT;
-//    }
-
-    public IssueCategory getIssueCategory() {
-        return issueCategory;
-    }
-
-    public IssuePriority getIssuePriority() {
-        return issuePriority;
-    }
-
-    public IssueStatus getIssueStatus() {
-        return issueStatus;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public void setIssueCategory(IssueCategory issueCategory) {
@@ -85,11 +58,4 @@ public class Issue {
     public void setIssueStatus(IssueStatus issueStatus) {
         this.issueStatus = issueStatus;
     }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-    public Issue() {
-    }
-
 }
