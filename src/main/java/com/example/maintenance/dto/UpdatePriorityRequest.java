@@ -1,6 +1,6 @@
 package com.example.maintenance.dto;
 
-import com.example.maintenance.model.IssuePriority;
+import com.example.maintenance.entity.Enum.IssuePriority;
 
 public class UpdatePriorityRequest {
 

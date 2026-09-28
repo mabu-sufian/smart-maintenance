@@ -1,6 +1,6 @@
 package com.example.maintenance.dto;
 
-import com.example.maintenance.model.IssueCategory;
+import com.example.maintenance.entity.Enum.IssueCategory;
 
 public class UpdateCategoryRequest {
 

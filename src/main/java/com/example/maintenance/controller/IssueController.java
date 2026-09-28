@@ -1,11 +1,11 @@
 package com.example.maintenance.controller;
 
 import com.example.maintenance.dto.*;
-import com.example.maintenance.model.Issue;
-import com.example.maintenance.model.IssuePriority;
+import com.example.maintenance.entity.Issue;
 import com.example.maintenance.service.IssueService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
