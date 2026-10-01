@@ -1,9 +1,6 @@
 package com.example.maintenance.exception.globalHandler;
 
-        import com.example.maintenance.exception.AlreadyRegisteredException;
-        import com.example.maintenance.exception.EmailNotExists;
-        import com.example.maintenance.exception.InvalidCredentialException;
-        import com.example.maintenance.exception.IssueNotFoundException;
+        import com.example.maintenance.exception.*;
         import com.example.maintenance.exception.response.ErrorResponse;
         import jakarta.servlet.http.HttpServletRequest;
         import org.springframework.http.HttpStatus;
@@ -52,6 +49,20 @@ public class GlobalExceptionHandler {
         public ResponseEntity<String>HandleAlreadyRegister(AlreadyRegisteredException ex)
         {
                 return ResponseEntity.status(HttpStatus.ALREADY_REPORTED )
+                        .body(ex.getMessage());
+        }
+
+        @ExceptionHandler(AssignmentNotFoundException.class)
+        public ResponseEntity<String>HanlerAssignmentNotFound(AssignmentNotFoundException ex)
+        {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ex.getMessage());
+        }
+
+        @ExceptionHandler(WrongTechnicianException.class)
+        public ResponseEntity<String> HandleWrongTechnician(WrongTechnicianException ex)
+        {
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
                         .body(ex.getMessage());
         }
 }

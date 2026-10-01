@@ -17,9 +17,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+
 public class IssueService {
 
     private final IssueRepository issueRepository;
@@ -78,6 +80,7 @@ public class IssueService {
         issue.setIssuePriority(issueRequestDTO.getIssuePriority());
         issue.setIssueStatus(IssueStatus.REPORTED);
         issue.setCreatedBy(currentUser);
+        issue.setCreatedAT(LocalDateTime.now());
        return issueRepository.save(issue);
     }
 
