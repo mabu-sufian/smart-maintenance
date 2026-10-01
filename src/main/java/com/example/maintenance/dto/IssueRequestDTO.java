@@ -1,8 +1,7 @@
 package com.example.maintenance.dto;
 
-import com.example.maintenance.model.IssueCategory;
-import com.example.maintenance.model.IssuePriority;
-import com.example.maintenance.model.IssueStatus;
+import com.example.maintenance.entity.Enum.IssueCategory;
+import com.example.maintenance.entity.Enum.IssuePriority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

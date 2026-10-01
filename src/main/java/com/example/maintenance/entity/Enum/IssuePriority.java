@@ -1,4 +1,4 @@
-package com.example.maintenance.model;
+package com.example.maintenance.entity.Enum;
 
 public enum IssuePriority {
     LOW,

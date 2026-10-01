@@ -1,0 +1,4 @@
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 7200000 # 72K millisecond= 72,00 seconds= 2 hours
+  #mySecret: joCExRbOBS71tAGWGSMKOwjqaXSJaQ2S4gKT72bAPn8=

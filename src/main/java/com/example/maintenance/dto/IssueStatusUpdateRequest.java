@@ -1,6 +1,6 @@
 package com.example.maintenance.dto;
 
-import com.example.maintenance.model.IssueStatus;
+import com.example.maintenance.entity.Enum.IssueStatus;
 
 public class IssueStatusUpdateRequest {
     private IssueStatus Status;
