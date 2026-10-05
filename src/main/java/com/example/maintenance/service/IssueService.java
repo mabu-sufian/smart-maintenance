@@ -55,7 +55,7 @@ public class IssueService {
     }
 
 
-    private boolean isTechnicianOrAbove()
+    protected boolean isTechnicianOrAbove()
     {
         Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
 
@@ -99,7 +99,7 @@ public class IssueService {
                 .orElseThrow(()-> new IssueNotFoundException("Issue not found "+ id));
         if(!isAdmin() && !isOwner(issue))
         {
-            throw new AccessDeniedException("You do not have permission to update this issue");
+            throw new AccessDeniedException("You do not have permission to view this issue");
         }
 
         return mapIssueToResponse(issue);

@@ -2,7 +2,9 @@ package com.example.maintenance.service;
 
 import com.example.maintenance.dto.AssignmentResponseDTO;
 import com.example.maintenance.entity.Assignment;
+import com.example.maintenance.entity.Emergency;
 import com.example.maintenance.entity.Enum.AssignmentStatus;
+import com.example.maintenance.entity.Enum.EmergencyStatus;
 import com.example.maintenance.entity.Enum.IssueStatus;
 import com.example.maintenance.entity.Enum.Role;
 import com.example.maintenance.entity.Issue;
@@ -11,6 +13,7 @@ import com.example.maintenance.exception.AssignmentNotFoundException;
 import com.example.maintenance.exception.IssueNotFoundException;
 import com.example.maintenance.exception.WrongTechnicianException;
 import com.example.maintenance.repositories.AssignmentRepository;
+import com.example.maintenance.repositories.EmergencyRepository;
 import com.example.maintenance.repositories.IssueRepository;
 import com.example.maintenance.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -27,12 +30,15 @@ public class AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
+    private final EmergencyRepository emergencyRepository;
 
-    public AssignmentService(AssignmentRepository assignmentRepository, IssueRepository issueRepository, UserRepository userRepository)
+    public AssignmentService(AssignmentRepository assignmentRepository, IssueRepository issueRepository, UserRepository userRepository,
+                             EmergencyRepository emergencyRepository)
     {
         this.assignmentRepository=assignmentRepository;
         this.issueRepository=issueRepository;
         this.userRepository=userRepository;
+        this.emergencyRepository=emergencyRepository;
     }
 
     public boolean isManager()
@@ -65,9 +71,9 @@ public class AssignmentService {
             throw new RuntimeException(technician.getRole().name()+ " is not a Technician.. ");
         }
 
-        if(!isManager() && isAdmin())
+        if(!isManager() && !isAdmin())
         {
-            throw  new RuntimeException("You are allow to do this");
+            throw  new RuntimeException("You are not allowed to assign technician");
         }
 
         Assignment assignment=new Assignment();
@@ -157,6 +163,15 @@ public class AssignmentService {
         issue.setIssueStatus(IssueStatus.IN_PROGRESS);
         issueRepository.save(issue);
 
+        if(assignment.getEmergency() !=null)
+        {
+           Emergency emergency= assignment.getEmergency();
+           emergency.setEmergencyStatus(EmergencyStatus.RESPONDING);
+           emergency.setResponseStartedAt(LocalDateTime.now());
+           emergencyRepository.save(emergency);
+
+        }
+
         return assignment;
     }
 
@@ -171,7 +186,7 @@ public class AssignmentService {
 
         User technician=assignment.getTechnician();
 
-        if(technician.getId() !=userId)
+        if(technician.getId().equals(userId))
         {
             throw new WrongTechnicianException("You are not assigned by this assignments.. ");
 
@@ -213,9 +228,21 @@ public class AssignmentService {
 
         Issue issue=assignment.getIssue();
         issue.setIssueStatus(IssueStatus.RESOLVED);
+        issueRepository.save(issue);
+
+        if(assignment.getEmergency() !=null)
+        {
+            Emergency emergency= assignment.getEmergency();
+            emergency.setEmergencyStatus(EmergencyStatus.RESOLVED);
+            emergency.setResolvedAt(LocalDateTime.now());
+            emergencyRepository.save(emergency);
+
+        }
 
        return assignmentRepository.save(assignment);
 
 
     }
+
+
 }

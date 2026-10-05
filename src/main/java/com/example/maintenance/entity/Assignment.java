@@ -31,6 +31,11 @@ public class Assignment {
 
     private LocalDateTime completedAt;
 
+    @ManyToOne
+    @JoinColumn(name="emergency_id")
+    private Emergency emergency;
+
+
     public Assignment() {
     }
 
@@ -52,6 +57,14 @@ public class Assignment {
 
     public User getTechnician() {
         return technician;
+    }
+
+    public Emergency getEmergency() {
+        return emergency;
+    }
+
+    public void setEmergency(Emergency emergency) {
+        this.emergency = emergency;
     }
 
     public void setTechnician(User technician) {
