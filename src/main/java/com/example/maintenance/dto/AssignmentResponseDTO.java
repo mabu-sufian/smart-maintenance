@@ -21,6 +21,12 @@ public class AssignmentResponseDTO {
 
     private LocalDateTime completedAt;
 
+    public void setDeadline(LocalDateTime deadline) {
+        this.deadline = deadline;
+    }
+
+    private LocalDateTime deadline;
+
     public AssignmentResponseDTO() {
     }
 

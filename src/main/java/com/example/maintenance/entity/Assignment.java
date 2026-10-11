@@ -30,6 +30,15 @@ public class Assignment {
     private LocalDateTime acceptedAt;
 
     private LocalDateTime completedAt;
+    private LocalDateTime deadline;
+
+    public LocalDateTime getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(LocalDateTime deadline) {
+        this.deadline = deadline;
+    }
 
     @ManyToOne
     @JoinColumn(name="emergency_id")

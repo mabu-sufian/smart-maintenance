@@ -1,0 +1,13 @@
+package com.example.maintenance.entity.Enum;
+
+public enum NotificationType {
+    ISSUE_CREATED,
+    ISSUE_ASSIGNED,
+    ISSUE_STATUS_CHANGED,
+    ASSIGNMENT_ACCEPTED,
+    ASSIGNMENT_COMPLETED,
+    EMERGENCY_CREATED,
+    EMERGENCY_RESPONDED,
+    ASSIGNMENT_OVERDUE,
+    ISSUE_ASSIGNMENT_PENDING
+}

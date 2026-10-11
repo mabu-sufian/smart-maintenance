@@ -2,3 +2,17 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 7200000 # 72K millisecond= 72,00 seconds= 2 hours
   #mySecret: joCExRbOBS71tAGWGSMKOwjqaXSJaQ2S4gKT72bAPn8=
+
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

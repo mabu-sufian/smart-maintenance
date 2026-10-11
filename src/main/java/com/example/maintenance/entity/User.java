@@ -24,6 +24,7 @@ private String name;
     @Column(nullable = false, length = 40)
    private Role role;
 
+
     public User() {
     }
 

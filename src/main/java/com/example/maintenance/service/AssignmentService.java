@@ -1,12 +1,10 @@
 package com.example.maintenance.service;
 
+import com.example.maintenance.dto.AssignmentRequestDTO;
 import com.example.maintenance.dto.AssignmentResponseDTO;
 import com.example.maintenance.entity.Assignment;
 import com.example.maintenance.entity.Emergency;
-import com.example.maintenance.entity.Enum.AssignmentStatus;
-import com.example.maintenance.entity.Enum.EmergencyStatus;
-import com.example.maintenance.entity.Enum.IssueStatus;
-import com.example.maintenance.entity.Enum.Role;
+import com.example.maintenance.entity.Enum.*;
 import com.example.maintenance.entity.Issue;
 import com.example.maintenance.entity.User;
 import com.example.maintenance.exception.AssignmentNotFoundException;
@@ -31,14 +29,19 @@ public class AssignmentService {
     private final UserRepository userRepository;
     private final IssueRepository issueRepository;
     private final EmergencyRepository emergencyRepository;
+    private final NotificationService notificationService;
+    private final IssueService issueService;
 
     public AssignmentService(AssignmentRepository assignmentRepository, IssueRepository issueRepository, UserRepository userRepository,
-                             EmergencyRepository emergencyRepository)
+                             EmergencyRepository emergencyRepository, NotificationService notificationService,
+                             IssueService issueService)
     {
         this.assignmentRepository=assignmentRepository;
         this.issueRepository=issueRepository;
         this.userRepository=userRepository;
         this.emergencyRepository=emergencyRepository;
+        this.notificationService=notificationService;
+        this.issueService=issueService;
     }
 
     public boolean isManager()
@@ -58,13 +61,13 @@ public class AssignmentService {
 
 
 
-    public Assignment createAssign(Long issueId, Long technicianId)
+    public Assignment createAssign(Long issueId, AssignmentRequestDTO requestDTO)
     {
         Issue issue=issueRepository.findById(issueId)
                 .orElseThrow(()-> new IssueNotFoundException("Issue Not found"));
 
-        User technician=userRepository.findById(technicianId)
-                .orElseThrow(()->new UsernameNotFoundException("Technician not found: " + technicianId));
+        User technician=userRepository.findById(requestDTO.getTechnicianId())
+                .orElseThrow(()->new UsernameNotFoundException("Technician not found: " + requestDTO.getTechnicianId()));
 
         if(technician.getRole() != Role.TECHNICIAN)
         {
@@ -82,9 +85,15 @@ public class AssignmentService {
         assignment.setTechnician(technician);
         assignment.setAssignedAt(LocalDateTime.now());
         assignment.setStatus(AssignmentStatus.ASSIGNED);
+        assignment.setDeadline(requestDTO.getDeadline());
 
         issue.setIssueStatus(IssueStatus.ASSIGNED);
         issueRepository.save(issue);
+
+        notificationService.createNotification(
+                technician.getId(),"New Issue Assigned",
+                "You have been assigned to issue #" +issue.getId()+".",
+                NotificationType.ISSUE_ASSIGNED);
         return assignmentRepository.save((assignment));
 
     }
@@ -160,8 +169,7 @@ public class AssignmentService {
         assignmentRepository.save(assignment);
 
         Issue issue=assignment.getIssue();
-        issue.setIssueStatus(IssueStatus.IN_PROGRESS);
-        issueRepository.save(issue);
+        issueService.updateStatus(issue.getId(),IssueStatus.IN_PROGRESS);
 
         if(assignment.getEmergency() !=null)
         {
@@ -227,8 +235,7 @@ public class AssignmentService {
         assignment.setCompletedAt(LocalDateTime.now());
 
         Issue issue=assignment.getIssue();
-        issue.setIssueStatus(IssueStatus.RESOLVED);
-        issueRepository.save(issue);
+        issueService.updateStatus(issue.getId(),IssueStatus.RESOLVED);
 
         if(assignment.getEmergency() !=null)
         {

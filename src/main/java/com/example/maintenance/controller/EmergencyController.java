@@ -58,7 +58,7 @@ public class EmergencyController {
 
     @PostMapping("/{emergencyId}/create_assignment")
     public ResponseEntity<AssignmentResponseDTO> createEmergencyAssignment(@PathVariable Long emergencyId, @RequestBody AssignmentRequestDTO requestDTO) {
-        Assignment assignment = emergencyService.creatEmergencyAssignment(emergencyId, requestDTO.getTechnicianId());
+        Assignment assignment = emergencyService.creatEmergencyAssignment(emergencyId, requestDTO);
         AssignmentResponseDTO responseDTO = new AssignmentResponseDTO();
 
         responseDTO.setId(assignment.getId());

@@ -4,6 +4,9 @@ import com.example.maintenance.dto.*;
 import com.example.maintenance.entity.Assignment;
 import com.example.maintenance.entity.Emergency;
 import com.example.maintenance.entity.Enum.EmergencyStatus;
+import com.example.maintenance.entity.Enum.IssueStatus;
+import com.example.maintenance.entity.Enum.NotificationType;
+import com.example.maintenance.entity.Enum.Role;
 import com.example.maintenance.entity.Issue;
 import com.example.maintenance.entity.User;
 import com.example.maintenance.exception.AssignmentNotFoundException;
@@ -31,6 +34,7 @@ public class EmergencyService {
     private final AssignmentService assignmentService;
     private final IssueService issueService;
     private final AssignmentRepository assignmentRepository;
+    private final NotificationService notificationService;
 
 
     public EmergencyService(EmergencyRepository emergencyRepository,
@@ -38,7 +42,8 @@ public class EmergencyService {
                             UserRepository userRepository,
                             AssignmentService assignmentService,
                             IssueService issueService,
-                            AssignmentRepository assignmentRepository)
+                            AssignmentRepository assignmentRepository,
+                            NotificationService notificationService)
     {
         this.emergencyRepository=emergencyRepository;
         this.issueRepository=issueRepository;
@@ -46,6 +51,7 @@ public class EmergencyService {
         this.assignmentService=assignmentService;
         this.issueService=issueService;
         this.assignmentRepository=assignmentRepository;
+        this.notificationService=notificationService;
     }
 
     public Emergency createEmergency(Long issueId, EmergencyRequestDTO requestDTO)
@@ -59,6 +65,11 @@ public class EmergencyService {
         Issue issue=issueRepository.findById(issueId)
                 .orElseThrow(()-> new IssueNotFoundException("Issue Not Found...."));
 
+        if(issue.getIssueStatus() != IssueStatus.REPORTED)
+        {
+            throw new RuntimeException("Issue are now solving phase...");
+        }
+
         Emergency emergency=new Emergency();
         emergency.setIssue(issue);
         emergency.setDescription(requestDTO.getDescription());
@@ -68,8 +79,19 @@ public class EmergencyService {
         emergency.setLocation(issue.getLocation());
         emergency.setCreatedAt(LocalDateTime.now());
         emergency.setTitle(issue.getTitle());
-
         emergencyRepository.save(emergency);
+
+        List<User>managerList=userRepository.findByRole(Role.MANAGER);
+        for(User manager: managerList)
+        {
+            notificationService.createNotification(
+                    manager.getId(),
+                    "Emergency Issue Created",
+                    issue.getTitle(),
+                    NotificationType.EMERGENCY_CREATED
+            );
+        }
+
         return emergency;
     }
 
@@ -125,17 +147,19 @@ public class EmergencyService {
 
 
     @Transactional
-    public Assignment creatEmergencyAssignment(Long emergencyId, Long technicianId)
+    public Assignment creatEmergencyAssignment(Long emergencyId, AssignmentRequestDTO requestDTO)
     {
         Emergency emergency=emergencyRepository.findById(emergencyId).orElseThrow(()->new RuntimeException("No emergency Found.."));
         Long issueId=emergency.getIssue().getId();
 
-        Assignment assignment=assignmentService.createAssign(issueId,technicianId);
+        Assignment assignment=assignmentService.createAssign(issueId,requestDTO);
         emergency.setAssignedAt(LocalDateTime.now());
         emergency.setEmergencyStatus(EmergencyStatus.ASSIGNED);
 
         emergencyRepository.save(emergency);
         assignment.setEmergency(emergency);
+
+
         return assignmentRepository.save(assignment);
     }
 

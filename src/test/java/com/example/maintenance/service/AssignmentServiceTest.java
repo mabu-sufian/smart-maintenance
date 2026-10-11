@@ -1,5 +1,6 @@
 package com.example.maintenance.service;
 
+import com.example.maintenance.dto.AssignmentRequestDTO;
 import com.example.maintenance.entity.Assignment;
 import com.example.maintenance.entity.Enum.AssignmentStatus;
 import com.example.maintenance.entity.Enum.Role;
@@ -65,9 +66,10 @@ class AssignmentServiceTest {
     {
         Issue issue=new Issue();
         issue.setId(10L);
-
+        AssignmentRequestDTO requestDTO=new AssignmentRequestDTO();
+        requestDTO.setTechnicianId(20L);
         User technician=new User();
-        technician.setId(20L);
+        //technician.setId(20L);
         technician.setRole(Role.TECHNICIAN);
 
         Assignment assignment=new Assignment();
@@ -81,7 +83,7 @@ class AssignmentServiceTest {
 
         when(assignmentRepository.save(any(Assignment.class))).thenReturn(assignment);
 
-        Assignment result=assignmentService.createAssign(10L, 20L);
+        Assignment result=assignmentService.createAssign(10L, requestDTO);
 
         assertEquals(AssignmentStatus.ASSIGNED, result.getStatus());
 

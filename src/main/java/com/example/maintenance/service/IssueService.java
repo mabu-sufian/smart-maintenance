@@ -2,6 +2,8 @@ package com.example.maintenance.service;
 
 import com.example.maintenance.dto.IssueRequestDTO;
 import com.example.maintenance.dto.IssueResponseDTO;
+import com.example.maintenance.entity.Enum.NotificationType;
+import com.example.maintenance.entity.Notification;
 import com.example.maintenance.entity.User;
 import com.example.maintenance.exception.IssueNotFoundException;
 import com.example.maintenance.entity.Issue;
@@ -16,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,9 +29,12 @@ public class IssueService {
 
     private final IssueRepository issueRepository;
     private final UserRepository userRepository;
-    public IssueService(IssueRepository issueRepository, UserRepository userRepository) {
+    private final NotificationService notificationService;
+
+    public IssueService(IssueRepository issueRepository, UserRepository userRepository, NotificationService notificationService) {
         this.issueRepository = issueRepository;
         this.userRepository=userRepository;
+        this.notificationService=notificationService;
     }
     //OwnerShip check of an issue
     private Long getCurrentUserId()
@@ -67,6 +73,8 @@ public class IssueService {
                 });
     }
 
+
+    @Transactional
     public Issue createIssue(IssueRequestDTO issueRequestDTO)
     {
         Long userId=getCurrentUserId();
@@ -81,6 +89,16 @@ public class IssueService {
         issue.setIssueStatus(IssueStatus.REPORTED);
         issue.setCreatedBy(currentUser);
         issue.setCreatedAT(LocalDateTime.now());
+
+        Notification notification=notificationService.createNotification(
+                userId,
+                "New Issue Created",
+                issueRequestDTO.getTitle(),
+                NotificationType.ISSUE_CREATED
+
+        );
+
+
        return issueRepository.save(issue);
     }
 
@@ -148,7 +166,7 @@ public class IssueService {
     }
 
 
-    public Issue updateStatus(Long id, IssueStatus newStatus)
+    public Issue updateStatus(Long issueId, IssueStatus newStatus)
     {
         if(!isTechnicianOrAbove())
         {
@@ -156,7 +174,7 @@ public class IssueService {
         }
 
 
-        Issue issue=issueRepository.findById(id)
+        Issue issue=issueRepository.findById(issueId)
                 .orElseThrow(()->new IssueNotFoundException("Issue is not found"));
 
         IssueStatus current=issue.getIssueStatus();
@@ -166,7 +184,17 @@ public class IssueService {
             throw new RuntimeException("Invalid Status: "+ current +" --> "+newStatus);
 
         }
+        IssueStatus oldStatus=issue.getIssueStatus();
         issue.setIssueStatus(newStatus);
+
+        notificationService.createNotification(
+                issue.getCreatedBy().getId(),
+                "Issue Status Updated",
+                "Issue #"+ issue.getId() + " status changed from "
+                        + oldStatus
+                        + " to "
+                        + newStatus + ".", NotificationType.ISSUE_STATUS_CHANGED);
+
         return  issueRepository.save(issue);
 
     }

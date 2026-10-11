@@ -28,7 +28,7 @@ public class AssignmentController {
     @PostMapping("/{issueId}")
     public ResponseEntity<AssignmentResponseDTO> createAssignment(@PathVariable Long issueId, @RequestBody AssignmentRequestDTO request )
     {
-        Assignment assignment=assignmentService.createAssign(issueId, request.getTechnicianId());
+        Assignment assignment=assignmentService.createAssign(issueId, request);
         AssignmentResponseDTO responseDTO=new AssignmentResponseDTO();
 
         responseDTO.setId(assignment.getId());
@@ -38,6 +38,7 @@ public class AssignmentController {
         responseDTO.setAssignedAt(assignment.getAssignedAt());
         responseDTO.setAcceptedAt(assignment.getAcceptedAt());
         responseDTO.setCompletedAt(assignment.getCompletedAt());
+        responseDTO.setDeadline(assignment.getDeadline());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
